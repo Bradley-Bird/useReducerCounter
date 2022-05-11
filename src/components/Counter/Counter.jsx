@@ -1,41 +1,57 @@
-import { useEffect, useState } from 'react'
+import { useReducer } from 'react'
 
 const pinkRGB = `rgb(236, 72, 153)`
+const greenRGB = `rgb(52, 211, 153)`
+const redRGB = `rgb(239, 68, 68)`
+const initialState = { count: 0, CurrentColor: pinkRGB }
+function getColor(count) {
+  let color = initialState.CurrentColor
+  if (count === 0) {
+    color = pinkRGB
+  }
+
+  if (count > 0) {
+    color = greenRGB
+  }
+
+  if (count < 0) {
+    color = redRGB
+  }
+  return color
+}
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1, CurrentColor: getColor(state.count + 1) }
+    case 'DECREMENT':
+      return { count: state.count - 1, CurrentColor: getColor(state.count - 1) }
+    case 'RESET':
+      return { count: 0, CurrentColor: getColor(0) }
+    default:
+      return state
+  }
+}
 
 export default function Counter() {
-  const [count, setCount] = useState(0)
-  const [currentColor, setCurrentColor] = useState(pinkRGB)
-
-  useEffect(() => {
-    if (count === 0) {
-      setCurrentColor(pinkRGB)
-    }
-
-    if (count > 0) {
-      setCurrentColor(`rgb(52, 211, 153)`)
-    }
-
-    if (count < 0) {
-      setCurrentColor(`rgb(239, 68, 68)`)
-    }
-  }, [count])
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   const increment = () => {
-    setCount((prevState) => prevState + 1)
+    dispatch({ type: 'INCREMENT' })
   }
 
   const decrement = () => {
-    setCount((prevState) => prevState - 1)
+    dispatch({ type: 'DECREMENT' })
   }
 
   const reset = () => {
-    setCount(0)
+    dispatch({ type: 'RESET' })
   }
 
   return (
     <main className="bg-black bg-opacity-90 min-h-screen flex flex-col items-center justify-center text-4xl text-pink-500">
-      <h1 className="mb-5" style={{ color: currentColor }}>
-        {count}
+      <h1 className="mb-5" style={{ color: state.CurrentColor }}>
+        {state.count}
       </h1>
       <div className="flex w-1/2 justify-around">
         <button
