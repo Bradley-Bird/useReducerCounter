@@ -1,41 +1,61 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useReducer } from 'react'
 
 const pinkRGB = `rgb(236, 72, 153)`
+const greenRGB = `rgb(52, 211, 153)`
+const redRGB = `rgb(239, 68, 68)`
+const initialState = { count: 0, CurrentColor: pinkRGB }
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1, CurrentColor: action.payload }
+    case 'DECREMENT':
+      return { count: state.count - 1, CurrentColor: action.payload }
+    case 'RESET':
+      return { count: 0, CurrentColor: action.payload }
+    default:
+      // throw new Error('Something went wrong, please try again.')
+      return state
+  }
+}
 
 export default function Counter() {
-  const [count, setCount] = useState(0)
-  const [currentColor, setCurrentColor] = useState(pinkRGB)
-
-  useEffect(() => {
-    if (count === 0) {
-      setCurrentColor(pinkRGB)
+  const [state, dispatch] = useReducer(reducer, initialState)
+  // const [count, setCount] = useState(0)
+  // const [currentColor, setCurrentColor] = useState(pinkRGB)
+  const handlePayloadLogic = () => {
+    if (state.count === 0) {
+      return pinkRGB
     }
 
-    if (count > 0) {
-      setCurrentColor(`rgb(52, 211, 153)`)
+    if (state.count > 0) {
+      return greenRGB
     }
 
-    if (count < 0) {
-      setCurrentColor(`rgb(239, 68, 68)`)
+    if (state.count < 0) {
+      return redRGB
     }
-  }, [count])
+  }
+  // useEffect(() => {
+
+  // }, [state.count])
 
   const increment = () => {
-    setCount((prevState) => prevState + 1)
+    dispatch({ type: 'INCREMENT', payload: handlePayloadLogic })
   }
 
   const decrement = () => {
-    setCount((prevState) => prevState - 1)
+    dispatch({ type: 'DECREMENT' })
   }
 
   const reset = () => {
-    setCount(0)
+    dispatch({ type: 'RESET' })
   }
 
   return (
     <main className="bg-black bg-opacity-90 min-h-screen flex flex-col items-center justify-center text-4xl text-pink-500">
-      <h1 className="mb-5" style={{ color: currentColor }}>
-        {count}
+      <h1 className="mb-5" style={{ color: state.currentColor }}>
+        {state.count}
       </h1>
       <div className="flex w-1/2 justify-around">
         <button
